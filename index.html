@@ -1,0 +1,3270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algiers University - Attendance Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a4d8c;
+            --secondary-color: #e63946;
+            --accent-color: #2a9d8f;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo img {
+            height: 50px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .user-menu {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 200px;
+            z-index: 1000;
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .dropdown-menu.active {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: block;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--dark-color);
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .dropdown-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Navigation Styles */
+        nav {
+            background-color: white;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            overflow-x: auto;
+        }
+        
+        .nav-tabs li {
+            flex-shrink: 0;
+        }
+        
+        .nav-tabs a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs a:hover, .nav-tabs a.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background-color: rgba(26, 77, 140, 0.05);
+        }
+        
+        /* Main Content Styles */
+        main {
+            padding: 30px 0;
+        }
+        
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .card-content {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .card-footer {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .card-stats {
+            background-color: var(--primary-color);
+        }
+        
+        .card-attendance {
+            background-color: var(--accent-color);
+        }
+        
+        .card-absent {
+            background-color: var(--danger-color);
+        }
+        
+        .card-justification {
+            background-color: var(--warning-color);
+        }
+        
+        /* Table Styles */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .table-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .status-present {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+        
+        .status-absent {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            color: var(--warning-color);
+            font-weight: 600;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background-color: #0d3a6b;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        
+        /* Back Button */
+        .btn-back {
+            background-color: #6c757d;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Form Styles */
+        .form-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(26, 77, 140, 0.25);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        /* Profile Picture Upload */
+        .profile-picture-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .profile-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .profile-picture-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            border: 3px solid var(--primary-color);
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+        
+        .profile-upload-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .profile-upload-btn:hover {
+            background-color: #0d3a6b;
+        }
+        
+        /* Faculty Selection */
+        .faculty-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .faculty-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .faculty-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .faculty-card.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(26, 77, 140, 0.05);
+        }
+        
+        .faculty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .faculty-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .faculty-desc {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        /* Department Selection */
+        .department-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .department-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .department-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+        
+        .department-card.selected {
+            border-color: var(--accent-color);
+            background-color: rgba(42, 157, 143, 0.05);
+        }
+        
+        .department-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+        
+        .department-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .department-desc {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        /* Level Selection */
+        .level-selection {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .level-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .level-btn:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .level-btn.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        /* Course Grid */
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .course-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .course-code {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .course-name {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .course-info {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        /* Tabs for different views */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Footer Styles */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-section a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #495057;
+            color: #adb5bd;
+        }
+        
+        /* Role-based pages */
+        .role-selection {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .role-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 250px;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .role-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .role-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        /* Login Form */
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 40px;
+        }
+        
+        .login-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 3rem;
+            color: var(--primary-color);
+        }
+        
+        /* Account Management */
+        .account-tabs {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        
+        .account-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .account-tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .account-content {
+            display: none;
+        }
+        
+        .account-content.active {
+            display: block;
+        }
+        
+        /* Charts */
+        .chart-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 30px;
+            height: 400px;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .role-selection {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .faculty-selection, .department-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-color);
+        }
+        
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            z-index: 1100;
+            display: none;
+        }
+        
+        .toast.error {
+            background-color: var(--danger-color);
+        }
+        
+        .toast.warning {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+        }
+
+        /* Email validation styles */
+        .email-validation {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .email-validation.valid {
+            color: var(--success-color);
+        }
+
+        .email-validation.invalid {
+            color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-university fa-2x"></i>
+                    <h1>Algiers University - Attendance Management System</h1>
+                </div>
+                <div class="user-info" id="user-info" style="display: none;">
+                    <div class="user-menu">
+                        <div class="user-avatar" id="user-avatar">JD</div>
+                        <div class="dropdown-menu" id="user-dropdown">
+                            <a href="#" class="dropdown-item" id="profile-link">
+                                <i class="fas fa-user"></i> My Profile
+                            </a>
+                            <a href="#" class="dropdown-item" id="account-settings-link">
+                                <i class="fas fa-cog"></i> Account Settings
+                            </a>
+                            <a href="#" class="dropdown-item" id="logout-link">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <div id="user-name">Prof. John Doe</div>
+                        <div id="user-role" style="font-size: 0.8rem; opacity: 0.8;">Computer Science Department</div>
+                    </div>
+                </div>
+                <div id="login-header" style="display: flex; gap: 10px;">
+                    <button id="login-btn" class="btn">Login</button>
+                    <button id="signup-btn" class="btn btn-success">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Section -->
+    <nav id="main-nav-container" style="display: none;">
+        <div class="container">
+            <ul class="nav-tabs" id="main-nav">
+                <!-- Navigation will be populated by JavaScript based on role -->
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content Section -->
+    <main class="container">
+        <!-- Login Page -->
+        <div id="login-page" class="tab-content active">
+            <div class="login-container">
+                <div class="login-logo">
+                    <i class="fas fa-university"></i>
+                </div>
+                <h2 class="login-title">Welcome to Algiers University</h2>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                        <div class="email-validation" id="login-email-validation">Please use a valid university email (@univ-alger.dz)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn" style="width: 100%;">Login</button>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <p>Don't have an account? <a href="#" id="show-signup">Sign up here</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sign Up Page -->
+        <div id="signup-page" class="tab-content">
+            <button class="btn btn-back" id="back-to-login-from-signup">
+                <i class="fas fa-arrow-left"></i> Back to Login
+            </button>
+            
+            <div class="login-container" style="max-width: 700px;">
+                <div class="login-logo">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2 class="login-title">Create Account</h2>
+                
+                <form id="signup-form">
+                    <!-- Profile Picture Upload -->
+                    <div class="profile-picture-container">
+                        <div class="profile-picture-placeholder" id="profile-preview">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <input type="file" id="profile-picture" accept="image/*" style="display: none;">
+                        <label for="profile-picture" class="profile-upload-btn">
+                            <i class="fas fa-camera"></i> Upload Profile Picture
+                        </label>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="signup-fname">First Name</label>
+                            <input type="text" id="signup-fname" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-lname">Last Name</label>
+                            <input type="text" id="signup-lname" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" required>
+                        <div class="email-validation" id="signup-email-validation">Please use a valid university email (@univ-alger.dz)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-role">Account Type</label>
+                        <select id="signup-role" required>
+                            <option value="">-- Select Role --</option>
+                            <option value="professor">Professor</option>
+                            <option value="student">Student</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Faculty Selection -->
+                    <div class="form-group">
+                        <label>Select Faculty</label>
+                        <div class="faculty-selection" id="faculty-selection">
+                            <div class="faculty-card" data-faculty="sciences">
+                                <div class="faculty-icon">
+                                    <i class="fas fa-flask"></i>
+                                </div>
+                                <div class="faculty-name">Faculty of Sciences</div>
+                                <div class="faculty-desc">Natural Sciences, Mathematics, Computer Science</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selected-faculty" required>
+                    </div>
+                    
+                    <!-- Department Selection -->
+                    <div class="form-group" id="department-selection-container">
+                        <label>Select Department</label>
+                        <div class="department-selection" id="department-selection">
+                            <!-- Departments will be populated based on faculty selection -->
+                        </div>
+                        <input type="hidden" id="selected-department" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-confirm-password">Confirm Password</label>
+                        <input type="password" id="signup-confirm-password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success" style="width: 100%;">Create Account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Account Management Page -->
+        <div id="account-page" class="tab-content">
+            <button class="btn btn-back" id="back-to-dashboard-from-account">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+            
+            <h2 class="section-title"><i class="fas fa-user-cog"></i> Account Management</h2>
+            
+            <div class="account-tabs">
+                <div class="account-tab active" data-tab="profile">Personal Information</div>
+                <div class="account-tab" data-tab="security">Security Settings</div>
+                <div class="account-tab" data-tab="preferences">Preferences</div>
+            </div>
+            
+            <!-- Profile Tab -->
+            <div id="profile-tab" class="account-content active">
+                <div class="form-container">
+                    <h3 style="margin-bottom: 20px;">Personal Information</h3>
+                    
+                    <!-- Profile Picture in Account Management -->
+                    <div class="profile-picture-container">
+                        <div class="profile-picture-placeholder" id="account-profile-preview">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <input type="file" id="account-profile-picture" accept="image/*" style="display: none;">
+                        <label for="account-profile-picture" class="profile-upload-btn">
+                            <i class="fas fa-camera"></i> Change Profile Picture
+                        </label>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profile-fname">First Name</label>
+                            <input type="text" id="profile-fname" value="John">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-lname">Last Name</label>
+                            <input type="text" id="profile-lname" value="Doe">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="profile-email">Email</label>
+                        <input type="email" id="profile-email" value="j.doe@univ-alger.dz">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="profile-phone">Phone Number</label>
+                        <input type="tel" id="profile-phone" value="+213 123 456 789">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="profile-faculty">Faculty</label>
+                        <input type="text" id="profile-faculty" value="Faculty of Sciences" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="profile-department">Department</label>
+                        <input type="text" id="profile-department" value="Computer Science" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="profile-bio">Bio</label>
+                        <textarea id="profile-bio" rows="4">Professor of Computer Science with 10 years of experience in database systems and web development.</textarea>
+                    </div>
+                    
+                    <button id="save-profile-btn" class="btn btn-success">Save Changes</button>
+                </div>
+            </div>
+            
+            <!-- Security Tab -->
+            <div id="security-tab" class="account-content">
+                <div class="form-container">
+                    <h3 style="margin-bottom: 20px;">Security Settings</h3>
+                    
+                    <div class="form-group">
+                        <label for="current-password">Current Password</label>
+                        <input type="password" id="current-password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-new-password">Confirm New Password</label>
+                        <input type="password" id="confirm-new-password">
+                    </div>
+                    
+                    <button id="change-password-btn" class="btn btn-success">Change Password</button>
+                </div>
+            </div>
+            
+            <!-- Preferences Tab -->
+            <div id="preferences-tab" class="account-content">
+                <div class="form-container">
+                    <h3 style="margin-bottom: 20px;">Preferences</h3>
+                    
+                    <div class="form-group">
+                        <label for="pref-language">Language</label>
+                        <select id="pref-language">
+                            <option value="en">English</option>
+                            <option value="fr" selected>French</option>
+                            <option value="ar">Arabic</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pref-timezone">Timezone</label>
+                        <select id="pref-timezone">
+                            <option value="+1" selected>Central European Time (CET)</option>
+                            <option value="+0">Greenwich Mean Time (GMT)</option>
+                            <option value="-5">Eastern Standard Time (EST)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pref-email-notifications">
+                            <input type="checkbox" id="pref-email-notifications" checked> Email Notifications
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pref-sms-notifications">
+                            <input type="checkbox" id="pref-sms-notifications"> SMS Notifications
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pref-auto-logout">
+                            <input type="checkbox" id="pref-auto-logout" checked> Auto-logout after 30 minutes of inactivity
+                        </label>
+                    </div>
+                    
+                    <button id="save-preferences-btn" class="btn btn-success">Save Preferences</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Professor Pages -->
+        <div id="professor-pages">
+            <!-- Professor Home Page -->
+            <div id="professor-home" class="tab-content">
+                <button class="btn btn-back" id="back-to-login-from-professor">
+                    <i class="fas fa-arrow-left"></i> Back to Login
+                </button>
+                <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> Professor Dashboard</h2>
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-header">
+                        <div class="card-title">Department Information</div>
+                    </div>
+                    <div class="card-content" style="font-size: 1.2rem;">
+                        <span id="professor-faculty-name">Faculty of Sciences</span> - <span id="professor-department-name">Computer Science Department</span>
+                    </div>
+                </div>
+                
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">My Courses</div>
+                            <div class="card-icon card-stats">
+                                <i class="fas fa-book"></i>
+                            </div>
+                        </div>
+                        <div class="card-content" id="professor-course-count">4</div>
+                        <div class="card-footer">Active this semester</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Today's Attendance</div>
+                            <div class="card-icon card-attendance">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">87%</div>
+                        <div class="card-footer">45/52 students present</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Pending Justifications</div>
+                            <div class="card-icon card-justification">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">8</div>
+                        <div class="card-footer">Requiring review</div>
+                    </div>
+                </div>
+                
+                <!-- Level Selection -->
+                <div class="form-container">
+                    <h3 style="margin-bottom: 15px;">Select Academic Level</h3>
+                    <div class="level-selection" id="professor-level-selection">
+                        <!-- Levels will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Courses Grid -->
+                <div id="professor-courses-container">
+                    <h3 style="margin-bottom: 20px;">My Courses</h3>
+                    <div class="course-grid" id="professor-courses-grid">
+                        <!-- Courses will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Professor Session Page -->
+            <div id="professor-session" class="tab-content">
+                <button class="btn btn-back" id="back-to-professor-home">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+                <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Take Attendance</h2>
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-content" style="font-size: 1.1rem;">
+                        <span id="session-faculty-name">Faculty of Sciences</span> - <span id="session-department-name">Computer Science Department</span>
+                    </div>
+                </div>
+                
+                <div class="form-container">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="course-select">Select Course</label>
+                            <select id="course-select">
+                                <option value="">-- Select a course --</option>
+                                <!-- Courses will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="session-date">Date</label>
+                            <input type="date" id="session-date">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="session-type">Session Type</label>
+                        <select id="session-type">
+                            <option value="lecture">Lecture</option>
+                            <option value="lab">Lab</option>
+                            <option value="tutorial">Tutorial</option>
+                        </select>
+                    </div>
+                    
+                    <button id="load-students-btn" class="btn">Load Student List</button>
+                </div>
+                
+                <div class="table-container">
+                    <h3 style="padding: 15px 20px; border-bottom: 1px solid #dee2e6;" id="session-title">Student Attendance</h3>
+                    <table id="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Student list will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                    
+                    <div style="padding: 15px 20px; text-align: right;">
+                        <button id="save-attendance-btn" class="btn btn-success">Save Attendance</button>
+                        <button id="export-attendance-btn" class="btn">Export to Excel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Professor Summary Page -->
+            <div id="professor-summary" class="tab-content">
+                <button class="btn btn-back" id="back-to-professor-home-from-summary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+                <h2 class="section-title"><i class="fas fa-chart-bar"></i> Attendance Summary</h2>
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-content" style="font-size: 1.1rem;">
+                        <span id="summary-faculty-name">Faculty of Sciences</span> - <span id="summary-department-name">Computer Science Department</span>
+                    </div>
+                </div>
+                
+                <div class="form-container">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="summary-course">Course</label>
+                            <select id="summary-course">
+                                <option value="">All Courses</option>
+                                <!-- Courses will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="summary-period">Period</label>
+                            <select id="summary-period">
+                                <option value="week">Last 7 days</option>
+                                <option value="month" selected>Last 30 days</option>
+                                <option value="semester">This Semester</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="generate-summary-btn" class="btn">Generate Summary</button>
+                </div>
+                
+                <div class="table-container">
+                    <h3 style="padding: 15px 20px; border-bottom: 1px solid #dee2e6;">Attendance Summary</h3>
+                    <table id="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th>Total Sessions</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Attendance Rate</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Summary data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Pages -->
+        <div id="student-pages">
+            <!-- Student Home Page -->
+            <div id="student-home" class="tab-content">
+                <button class="btn btn-back" id="back-to-login-from-student">
+                    <i class="fas fa-arrow-left"></i> Back to Login
+                </button>
+                <h2 class="section-title"><i class="fas fa-user-graduate"></i> Student Dashboard</h2>
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-header">
+                        <div class="card-title">Academic Information</div>
+                    </div>
+                    <div class="card-content" style="font-size: 1.2rem;">
+                        <span id="student-faculty-name">Faculty of Sciences</span> - <span id="student-department-name">Computer Science Department</span>
+                    </div>
+                </div>
+                
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">My Courses</div>
+                            <div class="card-icon card-stats">
+                                <i class="fas fa-book"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">5</div>
+                        <div class="card-footer">Enrolled this semester</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Overall Attendance</div>
+                            <div class="card-icon card-attendance">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">89%</div>
+                        <div class="card-footer">Across all courses</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Absences</div>
+                            <div class="card-icon card-absent">
+                                <i class="fas fa-user-times"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">7</div>
+                        <div class="card-footer">This semester</div>
+                    </div>
+                </div>
+                
+                <!-- Level Selection for Students - Now using same styling as professor -->
+                <div class="form-container">
+                    <h3 style="margin-bottom: 15px;">Select Academic Level</h3>
+                    <div class="level-selection" id="student-level-selection">
+                        <!-- Levels will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Student Courses Grid -->
+                <div id="student-courses-container">
+                    <h3 style="margin-bottom: 20px;">My Courses</h3>
+                    <div class="course-grid" id="student-courses-grid">
+                        <!-- Courses will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Student Attendance Page -->
+            <div id="student-attendance" class="tab-content">
+                <button class="btn btn-back" id="back-to-student-home">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+                <h2 class="section-title"><i class="fas fa-calendar-check"></i> My Attendance</h2>
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-content" style="font-size: 1.1rem;">
+                        <span id="student-attendance-faculty-name">Faculty of Sciences</span> - <span id="student-attendance-department-name">Computer Science Department</span>
+                    </div>
+                </div>
+                
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="student-course-select">Select Course</label>
+                        <select id="student-course-select">
+                            <option value="">-- Select a course --</option>
+                            <!-- Courses will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <button id="load-student-attendance-btn" class="btn">Load Attendance</button>
+                </div>
+                
+                <div class="table-container">
+                    <h3 style="padding: 15px 20px; border-bottom: 1px solid #dee2e6;" id="student-attendance-title">Attendance Records</h3>
+                    <table id="student-attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Session Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Attendance records will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Justification Form - Now Visible by Default -->
+                <div class="form-container" id="justification-form">
+                    <h3 style="margin-bottom: 20px;">Submit Absence Justification</h3>
+                    
+                    <div class="form-group">
+                        <label for="absence-date">Date of Absence</label>
+                        <input type="date" id="absence-date">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="justification-type">Justification Type</label>
+                        <select id="justification-type">
+                            <option value="medical">Medical</option>
+                            <option value="personal">Personal</option>
+                            <option value="family">Family Emergency</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="justification-details">Details</label>
+                        <textarea id="justification-details" rows="4" placeholder="Please provide details for your absence..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="supporting-docs">Supporting Documents (Optional)</label>
+                        <input type="file" id="supporting-docs">
+                    </div>
+                    
+                    <button id="submit-justification-btn" class="btn btn-success">Submit Justification</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Administrator Pages -->
+        <div id="admin-pages">
+            <!-- Admin Home Page -->
+            <div id="admin-home" class="tab-content">
+                <button class="btn btn-back" id="back-to-login-from-admin">
+                    <i class="fas fa-arrow-left"></i> Back to Login
+                </button>
+                <h2 class="section-title"><i class="fas fa-user-shield"></i> Administrator Dashboard</h2>
+                
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Total Students</div>
+                            <div class="card-icon card-stats">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">0</div>
+                        <div class="card-footer">Registered in system</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Total Professors</div>
+                            <div class="card-icon card-attendance">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">0</div>
+                        <div class="card-footer">Active this semester</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">System Usage</div>
+                            <div class="card-icon card-justification">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">0%</div>
+                        <div class="card-footer">Active courses using system</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Pending Actions</div>
+                            <div class="card-icon card-absent">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">0</div>
+                        <div class="card-footer">Requiring attention</div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <h3 style="padding: 15px 20px; border-bottom: 1px solid #dee2e6;">Recent System Activity</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>User</th>
+                                <th>Faculty</th>
+                                <th>Department</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Activity will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Admin Statistics Page -->
+            <div id="admin-statistics" class="tab-content">
+                <button class="btn btn-back" id="back-to-admin-home">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+                <h2 class="section-title"><i class="fas fa-chart-pie"></i> System Statistics</h2>
+                
+                <div class="form-container">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stats-period">Time Period</label>
+                            <select id="stats-period">
+                                <option value="week">Last 7 days</option>
+                                <option value="month" selected>Last 30 days</option>
+                                <option value="semester">This Semester</option>
+                                <option value="year">This Academic Year</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="stats-faculty">Faculty</label>
+                            <select id="stats-faculty">
+                                <option value="">All Faculties</option>
+                                <option value="sciences">Faculty of Sciences</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="generate-stats-btn" class="btn">Generate Statistics</button>
+                </div>
+                
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Overall Attendance Rate</div>
+                            <div class="card-icon card-stats">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">0%</div>
+                        <div class="card-footer">No data available</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Courses with Lowest Attendance</div>
+                            <div class="card-icon card-absent">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">No data</div>
+                        <div class="card-footer">No courses available</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Justification Approval Rate</div>
+                            <div class="card-icon card-justification">
+                                <i class="fas fa-file-check"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">0%</div>
+                        <div class="card-footer">No justifications submitted</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="attendance-chart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="faculty-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Admin Student Management Page -->
+            <div id="admin-students" class="tab-content">
+                <button class="btn btn-back" id="back-to-admin-home-from-students">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+                <h2 class="section-title"><i class="fas fa-user-graduate"></i> Student Management</h2>
+                
+                <div class="form-container">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="import-file">Import Student List</label>
+                            <input type="file" id="import-file" accept=".xlsx, .xls, .csv">
+                        </div>
+                        <div class="form-group">
+                            <label for="export-format">Export Format</label>
+                            <select id="export-format">
+                                <option value="excel">Excel (.xlsx)</option>
+                                <option value="csv">CSV</option>
+                                <option value="pdf">PDF</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <button id="import-students-btn" class="btn"><i class="fas fa-file-import"></i> Import from Excel</button>
+                        <button id="export-students-btn" class="btn btn-success"><i class="fas fa-file-export"></i> Export Student List</button>
+                        <button id="add-student-btn" class="btn"><i class="fas fa-plus"></i> Add New Student</button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <h3 style="padding: 15px 20px; border-bottom: 1px solid #dee2e6;">Student List</h3>
+                    <table id="admin-students-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Faculty</th>
+                                <th>Department</th>
+                                <th>Enrollment Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Student list will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Algiers University</h3>
+                    <p>Founded in 1909, Algiers University is one of the oldest and most prestigious universities in Algeria, committed to excellence in education and research.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">University Website</a></li>
+                        <li><a href="#">Student Portal</a></li>
+                        <li><a href="#">Faculty Directory</a></li>
+                        <li><a href="#">Academic Calendar</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 2 Rue Didouche Mourad, Algiers</li>
+                        <li><i class="fas fa-phone"></i> +213 21 63 53 76</li>
+                        <li><i class="fas fa-envelope"></i> info@univ-alger.dz</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Technical Support</h3>
+                    <ul>
+                        <li><a href="#">System Documentation</a></li>
+                        <li><a href="#">User Guide</a></li>
+                        <li><a href="#">Report an Issue</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                &copy; 2023 Algiers University - Attendance Management System. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <!-- Add Student Modal -->
+    <div id="add-student-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Student</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="add-student-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="new-student-id">Student ID</label>
+                        <input type="text" id="new-student-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-student-fname">First Name</label>
+                        <input type="text" id="new-student-fname" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="new-student-lname">Last Name</label>
+                        <input type="text" id="new-student-lname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-student-email">Email</label>
+                        <input type="email" id="new-student-email" required>
+                        <div class="email-validation" id="new-student-email-validation">Please use a valid university email (@univ-alger.dz)</div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="new-student-faculty">Faculty</label>
+                        <select id="new-student-faculty" required>
+                            <option value="">-- Select Faculty --</option>
+                            <option value="sciences">Faculty of Sciences</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-student-department">Department</label>
+                        <select id="new-student-department" required>
+                            <option value="">-- Select Department --</option>
+                            <!-- Departments will be populated based on faculty -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="new-student-level">Academic Level</label>
+                        <select id="new-student-level" required>
+                            <option value="">-- Select Level --</option>
+                            <option value="L1">L1</option>
+                            <option value="L2">L2</option>
+                            <option value="L3">L3</option>
+                            <option value="M1">M1</option>
+                            <option value="M2">M2</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-student-enrollment">Enrollment Date</label>
+                        <input type="date" id="new-student-enrollment" required>
+                    </div>
+                </div>
+                
+                <div style="text-align: right; margin-top: 20px;">
+                    <button type="button" class="btn btn-danger close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Application State
+        const state = {
+            currentUser: null,
+            currentRole: null,
+            users: [
+                { 
+                    id: 1, 
+                    email: 'admin@univ-alger.dz', 
+                    password: 'password', 
+                    role: 'admin', 
+                    firstName: 'Sarah', 
+                    lastName: 'Wilson', 
+                    phone: '+213 123 456 791', 
+                    faculty: 'administration',
+                    department: 'administration',
+                    level: 'all',
+                    bio: 'System administrator for the attendance management system',
+                    profilePicture: null
+                }
+            ],
+            students: [], // Empty - will be populated by admin
+            professors: [], // Empty - will be populated by admin
+            // Faculty and Department Structure
+            faculties: {
+                'sciences': {
+                    name: 'Faculty of Sciences',
+                    departments: {
+                        'computer_science': {
+                            name: 'Computer Science Department',
+                            levels: ['L1', 'L2', 'L3', 'M1', 'M2'],
+                            courses: {
+                                'L1': [
+                                    { code: 'CS101', name: 'Introduction to Programming', credits: 4, type: 'Fundamental' },
+                                    { code: 'CS102', name: 'Computer Systems', credits: 3, type: 'Fundamental' },
+                                    { code: 'MATH101', name: 'Calculus I', credits: 4, type: 'Mathematics' }
+                                ],
+                                'L2': [
+                                    { code: 'CS201', name: 'Data Structures', credits: 4, type: 'Fundamental' },
+                                    { code: 'CS202', name: 'Database Systems', credits: 4, type: 'Fundamental' },
+                                    { code: 'CS203', name: 'Web Development', credits: 3, type: 'Technical' }
+                                ],
+                                'L3': [
+                                    { code: 'CS301', name: 'Software Engineering', credits: 4, type: 'Fundamental' },
+                                    { code: 'CS302', name: 'Artificial Intelligence', credits: 3, type: 'Specialization' },
+                                    { code: 'CS303', name: 'Computer Networks', credits: 4, type: 'Technical' }
+                                ],
+                                'M1': [
+                                    { code: 'CS401', name: 'Machine Learning', credits: 4, type: 'Specialization' },
+                                    { code: 'CS402', name: 'Cloud Computing', credits: 3, type: 'Technical' },
+                                    { code: 'CS403', name: 'Mobile Development', credits: 3, type: 'Technical' }
+                                ],
+                                'M2': [
+                                    { code: 'CS501', name: 'Advanced Algorithms', credits: 4, type: 'Advanced' },
+                                    { code: 'CS502', name: 'Big Data Analytics', credits: 4, type: 'Specialization' },
+                                    { code: 'CS503', name: 'Cybersecurity', credits: 3, type: 'Specialization' }
+                                ]
+                            }
+                        },
+                        'mathematics': {
+                            name: 'Mathematics Department',
+                            levels: ['L1', 'L2', 'L3', 'M1', 'M2'],
+                            courses: {
+                                'L1': [
+                                    { code: 'MATH101', name: 'Calculus I', credits: 4, type: 'Fundamental' },
+                                    { code: 'MATH102', name: 'Linear Algebra', credits: 4, type: 'Fundamental' }
+                                ],
+                                'L2': [
+                                    { code: 'MATH201', name: 'Calculus II', credits: 4, type: 'Fundamental' },
+                                    { code: 'MATH202', name: 'Differential Equations', credits: 4, type: 'Fundamental' }
+                                ]
+                            }
+                        },
+                        'natural_life_sciences': {
+                            name: 'Natural and Life Sciences Department',
+                            levels: ['L1', 'L2', 'L3', 'M1', 'M2'],
+                            courses: {
+                                'L1': [
+                                    { code: 'BIO101', name: 'General Biology I', credits: 4, type: 'Fundamental' },
+                                    { code: 'CHM101', name: 'General Chemistry I', credits: 4, type: 'Fundamental' }
+                                ]
+                            }
+                        },
+                        'material_sciences': {
+                            name: 'Material Sciences Department',
+                            levels: ['L1', 'L2', 'L3', 'M1', 'M2'],
+                            courses: {
+                                'L1': [
+                                    { code: 'MAT101', name: 'Introduction to Materials', credits: 4, type: 'Fundamental' },
+                                    { code: 'PHY101', name: 'General Physics I', credits: 4, type: 'Fundamental' }
+                                ]
+                            }
+                        },
+                        'architecture': {
+                            name: 'Architecture Department',
+                            levels: ['L1', 'L2', 'L3', 'M1', 'M2'],
+                            courses: {
+                                'L1': [
+                                    { code: 'ARCH101', name: 'Introduction to Architecture', credits: 4, type: 'Fundamental' },
+                                    { code: 'ARCH102', name: 'Architectural Drawing', credits: 3, type: 'Technical' }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            attendance: {},
+            justifications: []
+        };
+
+        // Faculty and Department mapping
+        const facultyNames = {
+            'sciences': 'Faculty of Sciences',
+            'administration': 'Administration'
+        };
+
+        // Initialize the application
+        $(document).ready(function() {
+            // Set current date as default for date inputs
+            const today = new Date().toISOString().split('T')[0];
+            $('#session-date').val(today);
+            $('#absence-date').val(today);
+            $('#new-student-enrollment').val(today);
+            
+            // Initialize departments for Faculty of Sciences
+            populateDepartments('sciences');
+            
+            // Email validation for login
+            $('#login-email').on('input', function() {
+                validateEmail($(this).val(), '#login-email-validation');
+            });
+            
+            // Email validation for signup
+            $('#signup-email').on('input', function() {
+                validateEmail($(this).val(), '#signup-email-validation');
+            });
+            
+            // Email validation for new student
+            $('#new-student-email').on('input', function() {
+                validateEmail($(this).val(), '#new-student-email-validation');
+            });
+            
+            // Faculty selection
+            $('.faculty-card').on('click', function() {
+                const faculty = $(this).data('faculty');
+                $('.faculty-card').removeClass('selected');
+                $(this).addClass('selected');
+                $('#selected-faculty').val(faculty);
+                
+                // Show department selection
+                $('#department-selection-container').show();
+                populateDepartments(faculty);
+            });
+            
+            // Department selection
+            $(document).on('click', '.department-card', function() {
+                $('.department-card').removeClass('selected');
+                $(this).addClass('selected');
+                $('#selected-department').val($(this).data('department'));
+            });
+            
+            // Faculty change in admin student modal
+            $('#new-student-faculty').on('change', function() {
+                const faculty = $(this).val();
+                populateDepartmentDropdown(faculty, '#new-student-department');
+            });
+            
+            // Profile picture upload for signup
+            $('#profile-picture').on('change', function(e) {
+                handleProfilePictureUpload(e, '#profile-preview');
+            });
+            
+            // Profile picture upload for account management
+            $('#account-profile-picture').on('change', function(e) {
+                handleProfilePictureUpload(e, '#account-profile-preview');
+            });
+            
+            // Level selection for professors
+            $(document).on('click', '.level-btn', function() {
+                $('.level-btn').removeClass('selected');
+                $(this).addClass('selected');
+                const level = $(this).data('level');
+                loadCoursesForLevel(level);
+            });
+            
+            // Level selection for students - now using same styling as professor
+            $(document).on('click', '.student-level-btn', function() {
+                $('.student-level-btn').removeClass('selected');
+                $(this).addClass('selected');
+                const level = $(this).data('level');
+                loadStudentCoursesForLevel(level);
+            });
+            
+            // Login/Signup buttons
+            $('#login-btn').on('click', function() {
+                switchToTab('login-page');
+            });
+            
+            $('#signup-btn').on('click', function() {
+                switchToTab('signup-page');
+            });
+            
+            $('#show-signup').on('click', function(e) {
+                e.preventDefault();
+                switchToTab('signup-page');
+            });
+            
+            // Login form
+            $('#login-form').on('submit', function(e) {
+                e.preventDefault();
+                const email = $('#login-email').val();
+                const password = $('#login-password').val();
+                
+                if (!validateEmail(email, '#login-email-validation')) {
+                    showToast('Please use a valid university email (@univ-alger.dz)', 'error');
+                    return;
+                }
+                
+                loginUser(email, password);
+            });
+            
+            // Signup form
+            $('#signup-form').on('submit', function(e) {
+                e.preventDefault();
+                const fname = $('#signup-fname').val();
+                const lname = $('#signup-lname').val();
+                const email = $('#signup-email').val();
+                const role = $('#signup-role').val();
+                const faculty = $('#selected-faculty').val();
+                const department = $('#selected-department').val();
+                const password = $('#signup-password').val();
+                const confirmPassword = $('#signup-confirm-password').val();
+                
+                if (!validateEmail(email, '#signup-email-validation')) {
+                    showToast('Please use a valid university email (@univ-alger.dz)', 'error');
+                    return;
+                }
+                
+                if (!faculty) {
+                    showToast('Please select a faculty', 'error');
+                    return;
+                }
+                
+                if (!department) {
+                    showToast('Please select a department', 'error');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    showToast('Passwords do not match', 'error');
+                    return;
+                }
+                
+                registerUser(fname, lname, email, role, faculty, department, password);
+            });
+            
+            // User dropdown menu
+            $('#user-avatar').on('click', function() {
+                $('#user-dropdown').toggleClass('active');
+            });
+            
+            // Close dropdown when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.user-menu').length) {
+                    $('#user-dropdown').removeClass('active');
+                }
+            });
+            
+            // Account management links
+            $('#profile-link').on('click', function(e) {
+                e.preventDefault();
+                $('#user-dropdown').removeClass('active');
+                switchToTab('account-page');
+            });
+            
+            $('#account-settings-link').on('click', function(e) {
+                e.preventDefault();
+                $('#user-dropdown').removeClass('active');
+                switchToTab('account-page');
+            });
+            
+            $('#logout-link').on('click', function(e) {
+                e.preventDefault();
+                $('#user-dropdown').removeClass('active');
+                logout();
+            });
+            
+            // Account tabs
+            $('.account-tab').on('click', function() {
+                const tabId = $(this).data('tab');
+                $('.account-tab').removeClass('active');
+                $(this).addClass('active');
+                $('.account-content').removeClass('active');
+                $(`#${tabId}-tab`).addClass('active');
+            });
+            
+            // Save profile
+            $('#save-profile-btn').on('click', function() {
+                saveProfile();
+            });
+            
+            // Change password
+            $('#change-password-btn').on('click', function() {
+                changePassword();
+            });
+            
+            // Save preferences
+            $('#save-preferences-btn').on('click', function() {
+                savePreferences();
+            });
+            
+            // Back buttons
+            $('#back-to-login-from-signup').on('click', function() {
+                switchToTab('login-page');
+            });
+            
+            $('#back-to-dashboard-from-account').on('click', function() {
+                if (state.currentRole === 'professor') {
+                    switchToTab('professor-home');
+                } else if (state.currentRole === 'student') {
+                    switchToTab('student-home');
+                } else if (state.currentRole === 'admin') {
+                    switchToTab('admin-home');
+                }
+            });
+            
+            $('#back-to-login-from-professor').on('click', function() {
+                logout();
+            });
+            
+            $('#back-to-professor-home').on('click', function() {
+                switchToTab('professor-home');
+            });
+            
+            $('#back-to-professor-home-from-summary').on('click', function() {
+                switchToTab('professor-home');
+            });
+            
+            $('#back-to-login-from-student').on('click', function() {
+                logout();
+            });
+            
+            $('#back-to-student-home').on('click', function() {
+                switchToTab('student-home');
+            });
+            
+            $('#back-to-login-from-admin').on('click', function() {
+                logout();
+            });
+            
+            $('#back-to-admin-home').on('click', function() {
+                switchToTab('admin-home');
+            });
+            
+            $('#back-to-admin-home-from-students').on('click', function() {
+                switchToTab('admin-home');
+            });
+            
+            // Professor functionality
+            $('.take-attendance').on('click', function() {
+                const course = $(this).data('course');
+                $('#course-select').val(course);
+                switchToTab('professor-session');
+                loadStudentList(course);
+            });
+            
+            $('.view-sessions').on('click', function() {
+                const course = $(this).data('course');
+                $('#summary-course').val(course);
+                switchToTab('professor-summary');
+                generateSummary(course);
+            });
+            
+            $('#load-students-btn').on('click', function() {
+                const course = $('#course-select').val();
+                if (course) {
+                    loadStudentList(course);
+                } else {
+                    showToast('Please select a course first', 'error');
+                }
+            });
+            
+            $('#save-attendance-btn').on('click', function() {
+                saveAttendance();
+            });
+            
+            $('#export-attendance-btn').on('click', function() {
+                exportAttendance();
+            });
+            
+            $('#generate-summary-btn').on('click', function() {
+                const course = $('#summary-course').val();
+                generateSummary(course);
+            });
+            
+            // Student functionality
+            $('.view-attendance').on('click', function() {
+                const course = $(this).data('course');
+                $('#student-course-select').val(course);
+                switchToTab('student-attendance');
+                loadStudentAttendance(course);
+            });
+            
+            $('#load-student-attendance-btn').on('click', function() {
+                const course = $('#student-course-select').val();
+                if (course) {
+                    loadStudentAttendance(course);
+                } else {
+                    showToast('Please select a course first', 'error');
+                }
+            });
+            
+            $('#submit-justification-btn').on('click', function() {
+                submitJustification();
+            });
+            
+            // Admin functionality
+            $('#import-students-btn').on('click', function() {
+                importStudents();
+            });
+            
+            $('#export-students-btn').on('click', function() {
+                exportStudents();
+            });
+            
+            $('#add-student-btn').on('click', function() {
+                $('#add-student-modal').show();
+            });
+            
+            $('#add-student-form').on('submit', function(e) {
+                e.preventDefault();
+                addNewStudent();
+            });
+            
+            $('#generate-stats-btn').on('click', function() {
+                generateStatistics();
+            });
+            
+            // Modal close functionality
+            $('.close-modal').on('click', function() {
+                $(this).closest('.modal').hide();
+            });
+            
+            // Initialize charts
+            initCharts();
+        });
+        
+        // Email validation function
+        function validateEmail(email, validationElementId) {
+            const validationElement = $(validationElementId);
+            const isValid = email.endsWith('@univ-alger.dz');
+            
+            if (email === '') {
+                validationElement.hide();
+                return false;
+            }
+            
+            if (isValid) {
+                validationElement.removeClass('invalid').addClass('valid').text('Valid university email').show();
+                return true;
+            } else {
+                validationElement.removeClass('valid').addClass('invalid').text('Please use a valid university email (@univ-alger.dz)').show();
+                return false;
+            }
+        }
+        
+        // Populate departments based on faculty selection
+        function populateDepartments(faculty) {
+            const departmentSelection = $('#department-selection');
+            departmentSelection.empty();
+            
+            if (state.faculties[faculty]) {
+                const departments = state.faculties[faculty].departments;
+                
+                for (const [key, dept] of Object.entries(departments)) {
+                    const icon = getDepartmentIcon(key);
+                    departmentSelection.append(`
+                        <div class="department-card" data-department="${key}">
+                            <div class="department-icon">
+                                <i class="${icon}"></i>
+                            </div>
+                            <div class="department-name">${dept.name}</div>
+                            <div class="department-desc">${getDepartmentDescription(key)}</div>
+                        </div>
+                    `);
+                }
+            }
+        }
+        
+        // Populate department dropdown
+        function populateDepartmentDropdown(faculty, selector) {
+            const dropdown = $(selector);
+            dropdown.empty();
+            dropdown.append('<option value="">-- Select Department --</option>');
+            
+            if (state.faculties[faculty]) {
+                const departments = state.faculties[faculty].departments;
+                
+                for (const [key, dept] of Object.entries(departments)) {
+                    dropdown.append(`<option value="${key}">${dept.name}</option>`);
+                }
+            }
+        }
+        
+        // Get department icon
+        function getDepartmentIcon(department) {
+            const icons = {
+                'computer_science': 'fas fa-laptop-code',
+                'mathematics': 'fas fa-calculator',
+                'natural_life_sciences': 'fas fa-leaf',
+                'material_sciences': 'fas fa-atom',
+                'architecture': 'fas fa-ruler-combined',
+                'administration': 'fas fa-user-shield'
+            };
+            return icons[department] || 'fas fa-building';
+        }
+        
+        // Get department description
+        function getDepartmentDescription(department) {
+            const descriptions = {
+                'computer_science': 'Programming, Algorithms, Software Engineering',
+                'mathematics': 'Algebra, Calculus, Statistics, Applied Mathematics',
+                'natural_life_sciences': 'Biology, Chemistry, Environmental Sciences',
+                'material_sciences': 'Physics, Chemistry, Material Sciences',
+                'architecture': 'Architectural Design, Urban Planning, Construction',
+                'administration': 'System Administration and Management'
+            };
+            return descriptions[department] || 'Academic Department';
+        }
+        
+        // Load courses for selected level
+        function loadCoursesForLevel(level) {
+            if (!state.currentUser) return;
+            
+            const faculty = state.currentUser.faculty;
+            const department = state.currentUser.department;
+            const coursesGrid = $('#professor-courses-grid');
+            coursesGrid.empty();
+            
+            if (state.faculties[faculty] && 
+                state.faculties[faculty].departments[department] &&
+                state.faculties[faculty].departments[department].courses[level]) {
+                
+                const courses = state.faculties[faculty].departments[department].courses[level];
+                
+                courses.forEach(course => {
+                    coursesGrid.append(`
+                        <div class="course-card">
+                            <div class="course-code">${course.code}</div>
+                            <div class="course-name">${course.name}</div>
+                            <div class="course-info">Credits: ${course.credits} | Type: ${course.type}</div>
+                            <div style="margin-top: 15px;">
+                                <button class="btn take-attendance" data-course="${course.code}" style="margin-right: 10px;">
+                                    Take Attendance
+                                </button>
+                                <button class="btn view-sessions" data-course="${course.code}">
+                                    View Sessions
+                                </button>
+                            </div>
+                        </div>
+                    `);
+                });
+                
+                // Update course count
+                $('#professor-course-count').text(courses.length);
+            } else {
+                coursesGrid.append('<p>No courses available for this level.</p>');
+                $('#professor-course-count').text('0');
+            }
+            
+            // Re-attach event handlers for new buttons
+            $('.take-attendance').off('click').on('click', function() {
+                const course = $(this).data('course');
+                $('#course-select').val(course);
+                switchToTab('professor-session');
+                loadStudentList(course);
+            });
+            
+            $('.view-sessions').off('click').on('click', function() {
+                const course = $(this).data('course');
+                $('#summary-course').val(course);
+                switchToTab('professor-summary');
+                generateSummary(course);
+            });
+        }
+        
+        // Load student courses for selected level
+        function loadStudentCoursesForLevel(level) {
+            if (!state.currentUser) return;
+            
+            const faculty = state.currentUser.faculty;
+            const department = state.currentUser.department;
+            const coursesGrid = $('#student-courses-grid');
+            coursesGrid.empty();
+            
+            if (state.faculties[faculty] && 
+                state.faculties[faculty].departments[department] &&
+                state.faculties[faculty].departments[department].courses[level]) {
+                
+                const courses = state.faculties[faculty].departments[department].courses[level];
+                
+                courses.forEach(course => {
+                    coursesGrid.append(`
+                        <div class="course-card">
+                            <div class="course-code">${course.code}</div>
+                            <div class="course-name">${course.name}</div>
+                            <div class="course-info">Credits: ${course.credits} | Type: ${course.type}</div>
+                            <div style="margin-top: 15px;">
+                                <button class="btn view-attendance" data-course="${course.code}">
+                                    View Attendance
+                                </button>
+                            </div>
+                        </div>
+                    `);
+                });
+            } else {
+                coursesGrid.append('<p>No courses available for this level.</p>');
+            }
+            
+            // Re-attach event handlers for new buttons
+            $('.view-attendance').off('click').on('click', function() {
+                const course = $(this).data('course');
+                $('#student-course-select').val(course);
+                switchToTab('student-attendance');
+                loadStudentAttendance(course);
+            });
+        }
+        
+        // Populate level selection
+        function populateLevelSelection(selector, levels, isStudent = false) {
+            const levelSelection = $(selector);
+            levelSelection.empty();
+            
+            levels.forEach(level => {
+                // Use same styling for both professor and student levels
+                const btnClass = 'level-btn';
+                levelSelection.append(`
+                    <button class="${btnClass}" data-level="${level}">${level}</button>
+                `);
+            });
+            
+            // Select first level by default
+            if (levels.length > 0) {
+                $(`${selector} button:first`).addClass('selected');
+                const firstLevel = levels[0];
+                if (isStudent) {
+                    loadStudentCoursesForLevel(firstLevel);
+                } else {
+                    loadCoursesForLevel(firstLevel);
+                }
+            }
+        }
+        
+        // Profile picture handling
+        function handleProfilePictureUpload(event, previewSelector) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Create image element for preview
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'profile-picture';
+                    
+                    // Replace placeholder with actual image
+                    const preview = $(previewSelector);
+                    preview.empty();
+                    preview.append(img);
+                    
+                    // Store profile picture in current user
+                    if (state.currentUser) {
+                        state.currentUser.profilePicture = e.target.result;
+                        updateUserAvatar();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Update user avatar in header
+        function updateUserAvatar() {
+            const avatar = $('#user-avatar');
+            if (state.currentUser && state.currentUser.profilePicture) {
+                avatar.css('background-image', `url(${state.currentUser.profilePicture})`);
+                avatar.text(''); // Clear text if image is present
+            } else {
+                avatar.css('background-image', 'none');
+                avatar.text(state.currentUser.firstName.charAt(0) + state.currentUser.lastName.charAt(0));
+            }
+        }
+        
+        // User authentication functions
+        function loginUser(email, password) {
+            const user = state.users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                state.currentUser = user;
+                loginAsRole(user.role);
+                showToast(`Welcome back, ${user.firstName}!`, 'success');
+            } else {
+                showToast('Invalid email or password', 'error');
+            }
+        }
+        
+        function registerUser(fname, lname, email, role, faculty, department, password) {
+            // Check if user already exists
+            const existingUser = state.users.find(u => u.email === email);
+            if (existingUser) {
+                showToast('User with this email already exists', 'error');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: state.users.length + 1,
+                email: email,
+                password: password,
+                role: role,
+                firstName: fname,
+                lastName: lname,
+                faculty: faculty,
+                department: department,
+                level: role === 'student' ? 'L1' : 'all',
+                phone: '',
+                bio: '',
+                profilePicture: null
+            };
+            
+            state.users.push(newUser);
+            state.currentUser = newUser;
+            
+            loginAsRole(role);
+            showToast(`Account created successfully! Welcome, ${fname}!`, 'success');
+        }
+        
+        // Role-based login
+        function loginAsRole(role) {
+            state.currentRole = role;
+            
+            // Update UI based on role
+            $('#login-page').removeClass('active');
+            $('#signup-page').removeClass('active');
+            $('#user-info').show();
+            $('#login-header').hide();
+            $('#main-nav-container').show();
+            
+            // Set user info based on current user
+            if (state.currentUser) {
+                $('#user-name').text(`${state.currentUser.firstName} ${state.currentUser.lastName}`);
+                const facultyName = state.faculties[state.currentUser.faculty] ? state.faculties[state.currentUser.faculty].name : state.currentUser.faculty;
+                const departmentName = state.faculties[state.currentUser.faculty] && state.faculties[state.currentUser.faculty].departments[state.currentUser.department] 
+                    ? state.faculties[state.currentUser.faculty].departments[state.currentUser.department].name 
+                    : state.currentUser.department;
+                
+                $('#user-role').text(`${role.charAt(0).toUpperCase() + role.slice(1)} - ${departmentName}`);
+                
+                // Update profile form with user data
+                $('#profile-fname').val(state.currentUser.firstName);
+                $('#profile-lname').val(state.currentUser.lastName);
+                $('#profile-email').val(state.currentUser.email);
+                $('#profile-phone').val(state.currentUser.phone);
+                $('#profile-faculty').val(facultyName);
+                $('#profile-department').val(departmentName);
+                $('#profile-bio').val(state.currentUser.bio);
+                
+                // Update profile picture previews
+                updateProfilePreviews();
+                updateUserAvatar();
+                
+                // Update faculty and department names in dashboards
+                updateFacultyDepartmentDisplay();
+                
+                // Populate level selection
+                if (state.currentUser.faculty && state.currentUser.department) {
+                    const levels = state.faculties[state.currentUser.faculty].departments[state.currentUser.department].levels;
+                    if (role === 'professor') {
+                        populateLevelSelection('#professor-level-selection', levels);
+                    } else if (role === 'student') {
+                        populateLevelSelection('#student-level-selection', levels, true);
+                    }
+                }
+            }
+            
+            if (role === 'professor') {
+                switchToTab('professor-home');
+                updateNavigation(getProfessorNavigation());
+            } else if (role === 'student') {
+                switchToTab('student-home');
+                updateNavigation(getStudentNavigation());
+            } else if (role === 'admin') {
+                switchToTab('admin-home');
+                updateNavigation(getAdminNavigation());
+                loadAdminStudentsTable();
+            }
+        }
+        
+        // Update profile picture previews
+        function updateProfilePreviews() {
+            if (state.currentUser && state.currentUser.profilePicture) {
+                // Update signup preview
+                $('#profile-preview').empty().append(
+                    $('<img>').addClass('profile-picture').attr('src', state.currentUser.profilePicture)
+                );
+                
+                // Update account management preview
+                $('#account-profile-preview').empty().append(
+                    $('<img>').addClass('profile-picture').attr('src', state.currentUser.profilePicture)
+                );
+            }
+        }
+        
+        // Update faculty and department display across the application
+        function updateFacultyDepartmentDisplay() {
+            if (state.currentUser) {
+                const facultyName = state.faculties[state.currentUser.faculty] ? state.faculties[state.currentUser.faculty].name : state.currentUser.faculty;
+                const departmentName = state.faculties[state.currentUser.faculty] && state.faculties[state.currentUser.faculty].departments[state.currentUser.department] 
+                    ? state.faculties[state.currentUser.faculty].departments[state.currentUser.department].name 
+                    : state.currentUser.department;
+                
+                // Update professor pages
+                $('#professor-faculty-name').text(facultyName);
+                $('#professor-department-name').text(departmentName);
+                $('#session-faculty-name').text(facultyName);
+                $('#session-department-name').text(departmentName);
+                $('#summary-faculty-name').text(facultyName);
+                $('#summary-department-name').text(departmentName);
+                
+                // Update student pages
+                $('#student-faculty-name').text(facultyName);
+                $('#student-department-name').text(departmentName);
+                $('#student-attendance-faculty-name').text(facultyName);
+                $('#student-attendance-department-name').text(departmentName);
+                
+                // Populate course dropdowns
+                populateCourseDropdowns();
+            }
+        }
+        
+        // Populate course dropdowns
+        function populateCourseDropdowns() {
+            if (!state.currentUser) return;
+            
+            const faculty = state.currentUser.faculty;
+            const department = state.currentUser.department;
+            const courseSelect = $('#course-select');
+            const summaryCourse = $('#summary-course');
+            const studentCourseSelect = $('#student-course-select');
+            
+            courseSelect.empty().append('<option value="">-- Select a course --</option>');
+            summaryCourse.empty().append('<option value="">All Courses</option>');
+            studentCourseSelect.empty().append('<option value="">-- Select a course --</option>');
+            
+            if (state.faculties[faculty] && state.faculties[faculty].departments[department]) {
+                const levels = state.faculties[faculty].departments[department].levels;
+                
+                levels.forEach(level => {
+                    if (state.faculties[faculty].departments[department].courses[level]) {
+                        state.faculties[faculty].departments[department].courses[level].forEach(course => {
+                            courseSelect.append(`<option value="${course.code}">${course.code} - ${course.name}</option>`);
+                            summaryCourse.append(`<option value="${course.code}">${course.code} - ${course.name}</option>`);
+                            studentCourseSelect.append(`<option value="${course.code}">${course.code} - ${course.name}</option>`);
+                        });
+                    }
+                });
+            }
+        }
+        
+        // Logout function
+        function logout() {
+            state.currentUser = null;
+            state.currentRole = null;
+            $('#login-page').addClass('active');
+            $('#user-info').hide();
+            $('#login-header').show();
+            $('#main-nav-container').hide();
+            $('#main-nav').empty();
+            $('.tab-content').removeClass('active');
+            showToast('Successfully logged out', 'success');
+        }
+        
+        // Account management functions
+        function saveProfile() {
+            if (!state.currentUser) return;
+            
+            // Update user data
+            state.currentUser.firstName = $('#profile-fname').val();
+            state.currentUser.lastName = $('#profile-lname').val();
+            state.currentUser.email = $('#profile-email').val();
+            state.currentUser.phone = $('#profile-phone').val();
+            state.currentUser.bio = $('#profile-bio').val();
+            
+            // Update UI
+            $('#user-name').text(`${state.currentUser.firstName} ${state.currentUser.lastName}`);
+            updateUserAvatar();
+            updateFacultyDepartmentDisplay();
+            
+            showToast('Profile updated successfully', 'success');
+        }
+        
+        function changePassword() {
+            const currentPassword = $('#current-password').val();
+            const newPassword = $('#new-password').val();
+            const confirmNewPassword = $('#confirm-new-password').val();
+            
+            if (!state.currentUser) return;
+            
+            if (currentPassword !== state.currentUser.password) {
+                showToast('Current password is incorrect', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmNewPassword) {
+                showToast('New passwords do not match', 'error');
+                return;
+            }
+            
+            state.currentUser.password = newPassword;
+            $('#current-password').val('');
+            $('#new-password').val('');
+            $('#confirm-new-password').val('');
+            
+            showToast('Password changed successfully', 'success');
+        }
+        
+        function savePreferences() {
+            // In a real app, we would save these preferences to the user's account
+            showToast('Preferences saved successfully', 'success');
+        }
+        
+        // Navigation functions
+        function getProfessorNavigation() {
+            return [
+                { id: 'professor-home', text: 'Dashboard', icon: 'tachometer-alt' },
+                { id: 'professor-session', text: 'Take Attendance', icon: 'clipboard-list' },
+                { id: 'professor-summary', text: 'Attendance Summary', icon: 'chart-bar' }
+            ];
+        }
+        
+        function getStudentNavigation() {
+            return [
+                { id: 'student-home', text: 'Dashboard', icon: 'tachometer-alt' },
+                { id: 'student-attendance', text: 'My Attendance', icon: 'calendar-check' }
+            ];
+        }
+        
+        function getAdminNavigation() {
+            return [
+                { id: 'admin-home', text: 'Dashboard', icon: 'tachometer-alt' },
+                { id: 'admin-statistics', text: 'Statistics', icon: 'chart-pie' },
+                { id: 'admin-students', text: 'Student Management', icon: 'user-graduate' }
+            ];
+        }
+        
+        function updateNavigation(navItems) {
+            $('#main-nav').empty();
+            navItems.forEach(item => {
+                $('#main-nav').append(
+                    `<li><a href="#" data-tab="${item.id}"><i class="fas fa-${item.icon}"></i> ${item.text}</a></li>`
+                );
+            });
+            
+            // Add click handlers for navigation
+            $('#main-nav a').on('click', function(e) {
+                e.preventDefault();
+                const tabId = $(this).data('tab');
+                switchToTab(tabId);
+            });
+            
+            // Set first tab as active
+            if (navItems.length > 0) {
+                $(`#main-nav a[data-tab="${navItems[0].id}"]`).addClass('active');
+            }
+        }
+        
+        function switchToTab(tabId) {
+            // Hide all tab contents
+            $('.tab-content').removeClass('active');
+            $('#main-nav a').removeClass('active');
+            
+            // Show selected tab content
+            $(`#${tabId}`).addClass('active');
+            $(`#main-nav a[data-tab="${tabId}"]`).addClass('active');
+            
+            // Special handling for certain tabs
+            if (tabId === 'professor-summary') {
+                const course = $('#summary-course').val() || '';
+                generateSummary(course);
+            } else if (tabId === 'admin-statistics') {
+                generateStatistics();
+            } else if (tabId === 'admin-students') {
+                loadAdminStudentsTable();
+            }
+        }
+        
+        // Professor functions
+        function loadStudentList(course) {
+            if (!state.currentUser) return;
+            
+            const faculty = state.currentUser.faculty;
+            const department = state.currentUser.department;
+            
+            // Find course name
+            let courseName = course;
+            if (state.faculties[faculty] && state.faculties[faculty].departments[department]) {
+                const levels = state.faculties[faculty].departments[department].levels;
+                for (const level of levels) {
+                    if (state.faculties[faculty].departments[department].courses[level]) {
+                        const foundCourse = state.faculties[faculty].departments[department].courses[level].find(c => c.code === course);
+                        if (foundCourse) {
+                            courseName = foundCourse.name;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            $('#session-title').text(`Student Attendance for ${course} - ${courseName} - ${$('#session-date').val()}`);
+            
+            const tbody = $('#attendance-table tbody');
+            tbody.empty();
+            
+            // Filter students by faculty and department
+            const departmentStudents = state.students.filter(student => 
+                student.faculty === faculty && student.department === department);
+            
+            if (departmentStudents.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 20px;">
+                            No students found for this department. Please add students through the admin panel.
+                        </td>
+                    </tr>
+                `);
+            } else {
+                departmentStudents.forEach(student => {
+                    const status = 'present'; // Default status
+                    
+                    tbody.append(`
+                        <tr>
+                            <td>${student.id}</td>
+                            <td>${student.name}</td>
+                            <td class="status-${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</td>
+                            <td>
+                                <button class="btn ${status === 'present' ? 'btn-danger' : 'btn-success'} toggle-status" data-student="${student.id}">
+                                    ${status === 'present' ? 'Mark Absent' : 'Mark Present'}
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+                
+                // Add toggle functionality
+                $('.toggle-status').on('click', function() {
+                    const studentId = $(this).data('student');
+                    const $row = $(this).closest('tr');
+                    const $statusCell = $row.find('td:nth-child(3)');
+                    
+                    if ($statusCell.hasClass('status-present')) {
+                        $statusCell.removeClass('status-present').addClass('status-absent').text('Absent');
+                        $(this).removeClass('btn-danger').addClass('btn-success').text('Mark Present');
+                    } else {
+                        $statusCell.removeClass('status-absent').addClass('status-present').text('Present');
+                        $(this).removeClass('btn-success').addClass('btn-danger').text('Mark Absent');
+                    }
+                });
+            }
+        }
+        
+        function saveAttendance() {
+            const course = $('#course-select').val();
+            const date = $('#session-date').val();
+            const type = $('#session-type').val();
+            
+            if (!course) {
+                showToast('Please select a course', 'error');
+                return;
+            }
+            
+            // In a real app, we would save to a database
+            // For this demo, we'll just show a success message
+            showToast(`Attendance for ${course} saved successfully`, 'success');
+        }
+        
+        function exportAttendance() {
+            // In a real app, this would generate and download an Excel file
+            showToast('Attendance data exported successfully', 'success');
+        }
+        
+        function generateSummary(course) {
+            if (!state.currentUser) return;
+            
+            const faculty = state.currentUser.faculty;
+            const department = state.currentUser.department;
+            const tbody = $('#summary-table tbody');
+            tbody.empty();
+            
+            // Filter students by faculty and department
+            const departmentStudents = state.students.filter(student => 
+                student.faculty === faculty && student.department === department);
+            
+            if (departmentStudents.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 20px;">
+                            No students found for this department. Please add students through the admin panel.
+                        </td>
+                    </tr>
+                `);
+                return;
+            }
+            
+            // Calculate attendance for each student
+            departmentStudents.forEach(student => {
+                let totalSessions = 0;
+                let presentCount = 0;
+                
+                // Check attendance for the selected course
+                if (state.attendance[faculty] && 
+                    state.attendance[faculty][department] && 
+                    state.attendance[faculty][department][course]) {
+                    
+                    state.attendance[faculty][department][course].forEach(session => {
+                        totalSessions++;
+                        const record = session.records.find(r => r.studentId === student.id);
+                        if (record && record.status === 'present') {
+                            presentCount++;
+                        }
+                    });
+                }
+                
+                const attendanceRate = totalSessions > 0 ? Math.round((presentCount / totalSessions) * 100) : 0;
+                let status = 'Good';
+                if (attendanceRate < 70) status = 'At Risk';
+                else if (attendanceRate < 80) status = 'Warning';
+                
+                tbody.append(`
+                    <tr>
+                        <td>${student.id}</td>
+                        <td>${student.name}</td>
+                        <td>${totalSessions}</td>
+                        <td>${presentCount}</td>
+                        <td>${totalSessions - presentCount}</td>
+                        <td class="status-${attendanceRate >= 80 ? 'present' : 'absent'}">${attendanceRate}%</td>
+                        <td>${status}</td>
+                    </tr>
+                `);
+            });
+        }
+        
+        // Student functions
+        function loadStudentAttendance(course) {
+            if (!state.currentUser) return;
+            
+            const faculty = state.currentUser.faculty;
+            const department = state.currentUser.department;
+            
+            // Find course name
+            let courseName = course;
+            if (state.faculties[faculty] && state.faculties[faculty].departments[department]) {
+                const levels = state.faculties[faculty].departments[department].levels;
+                for (const level of levels) {
+                    if (state.faculties[faculty].departments[department].courses[level]) {
+                        const foundCourse = state.faculties[faculty].departments[department].courses[level].find(c => c.code === course);
+                        if (foundCourse) {
+                            courseName = foundCourse.name;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            $('#student-attendance-title').text(`My Attendance for ${course} - ${courseName}`);
+            
+            const tbody = $('#student-attendance-table tbody');
+            tbody.empty();
+            
+            // In a real app, we would get the current student's ID from authentication
+            const studentId = state.currentUser.id;
+            
+            if (state.attendance[faculty] && 
+                state.attendance[faculty][department] && 
+                state.attendance[faculty][department][course]) {
+                
+                state.attendance[faculty][department][course].forEach(session => {
+                    const record = session.records.find(r => r.studentId === studentId);
+                    const status = record ? record.status : 'absent';
+                    
+                    tbody.append(`
+                        <tr>
+                            <td>${session.date}</td>
+                            <td>${session.type.charAt(0).toUpperCase() + session.type.slice(1)}</td>
+                            <td class="status-${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</td>
+                            <td>
+                                ${status === 'absent' ? 
+                                    `<button class="btn btn-warning justify-absence" data-date="${session.date}">Justify Absence</button>` : 
+                                    ''}
+                            </td>
+                        </tr>
+                    `);
+                });
+            } else {
+                tbody.append(`
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 20px;">
+                            No attendance records found for this course.
+                        </td>
+                    </tr>
+                `);
+            }
+            
+            // Add justification functionality
+            $('.justify-absence').on('click', function() {
+                const date = $(this).data('date');
+                $('#absence-date').val(date);
+                $('html, body').animate({
+                    scrollTop: $('#justification-form').offset().top - 100
+                }, 500);
+            });
+        }
+        
+        function submitJustification() {
+            const date = $('#absence-date').val();
+            const type = $('#justification-type').val();
+            const details = $('#justification-details').val();
+            
+            if (!details) {
+                showToast('Please provide details for your absence', 'error');
+                return;
+            }
+            
+            // In a real app, we would save to a database
+            state.justifications.push({
+                date: date,
+                type: type,
+                details: details,
+                status: 'pending'
+            });
+            
+            showToast('Absence justification submitted successfully', 'success');
+            $('#justification-details').val('');
+        }
+        
+        // Admin functions
+        function loadAdminStudentsTable() {
+            const tbody = $('#admin-students-table tbody');
+            tbody.empty();
+            
+            if (state.students.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 20px;">
+                            No students found. Use the "Add New Student" button to add students to the system.
+                        </td>
+                    </tr>
+                `);
+            } else {
+                state.students.forEach(student => {
+                    const facultyName = state.faculties[student.faculty] ? state.faculties[student.faculty].name : student.faculty;
+                    const departmentName = state.faculties[student.faculty] && state.faculties[student.faculty].departments[student.department] 
+                        ? state.faculties[student.faculty].departments[student.department].name 
+                        : student.department;
+                    
+                    tbody.append(`
+                        <tr>
+                            <td>${student.id}</td>
+                            <td>${student.name}</td>
+                            <td>${student.email}</td>
+                            <td>${facultyName}</td>
+                            <td>${departmentName}</td>
+                            <td>${student.enrollment}</td>
+                            <td class="status-present">${student.status.charAt(0).toUpperCase() + student.status.slice(1)}</td>
+                            <td>
+                                <button class="btn edit-student" data-id="${student.id}">Edit</button>
+                                <button class="btn btn-danger remove-student" data-id="${student.id}">Remove</button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+            
+            // Add event handlers
+            $('.edit-student').on('click', function() {
+                const studentId = $(this).data('id');
+                showToast(`Edit student ${studentId} - Feature coming soon`, 'warning');
+            });
+            
+            $('.remove-student').on('click', function() {
+                const studentId = $(this).data('id');
+                if (confirm(`Are you sure you want to remove student ${studentId}?`)) {
+                    // In a real app, we would remove from database
+                    state.students = state.students.filter(s => s.id !== studentId);
+                    loadAdminStudentsTable();
+                    showToast(`Student ${studentId} removed successfully`, 'success');
+                }
+            });
+        }
+        
+        function importStudents() {
+            // In a real app, this would process an uploaded Excel file
+            showToast('Student list imported successfully', 'success');
+        }
+        
+        function exportStudents() {
+            // In a real app, this would generate and download an Excel file
+            showToast('Student list exported successfully', 'success');
+        }
+        
+        function addNewStudent() {
+            const id = $('#new-student-id').val();
+            const fname = $('#new-student-fname').val();
+            const lname = $('#new-student-lname').val();
+            const email = $('#new-student-email').val();
+            const faculty = $('#new-student-faculty').val();
+            const department = $('#new-student-department').val();
+            const level = $('#new-student-level').val();
+            const enrollment = $('#new-student-enrollment').val();
+            
+            if (!validateEmail(email, '#new-student-email-validation')) {
+                showToast('Please use a valid university email (@univ-alger.dz)', 'error');
+                return;
+            }
+            
+            // Add to state
+            state.students.push({
+                id: id,
+                name: `${fname} ${lname}`,
+                email: email,
+                faculty: faculty,
+                department: department,
+                level: level,
+                enrollment: enrollment,
+                status: 'active'
+            });
+            
+            // Close modal and reset form
+            $('#add-student-modal').hide();
+            $('#add-student-form')[0].reset();
+            
+            // Reload table
+            loadAdminStudentsTable();
+            
+            showToast(`Student ${id} added successfully`, 'success');
+        }
+        
+        function generateStatistics() {
+            // In a real app, we would fetch data from the server
+            // For this demo, we'll use sample data
+            
+            // Update attendance chart
+            updateAttendanceChart();
+            
+            // Update faculty chart
+            updateFacultyChart();
+        }
+        
+        function initCharts() {
+            // Initialize charts with empty data
+            window.attendanceChart = new Chart($('#attendance-chart'), {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Attendance Rate',
+                        data: [0, 0, 0, 0],
+                        borderColor: '#1a4d8c',
+                        backgroundColor: 'rgba(26, 77, 140, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+            
+            window.facultyChart = new Chart($('#faculty-chart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Computer Science', 'Mathematics', 'Natural & Life Sciences', 'Material Sciences', 'Architecture'],
+                    datasets: [{
+                        label: 'Average Attendance Rate',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: [
+                            'rgba(26, 77, 140, 0.7)',
+                            'rgba(42, 157, 143, 0.7)',
+                            'rgba(230, 57, 70, 0.7)',
+                            'rgba(255, 193, 7, 0.7)',
+                            'rgba(108, 117, 125, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateAttendanceChart() {
+            // In a real app, we would update with real data
+            // For this demo, we'll just use sample data
+            const newData = [0, 0, 0, 0, 0, 0];
+            const newLabels = ['Oct 16', 'Oct 23', 'Oct 30', 'Nov 6', 'Nov 13', 'Nov 20'];
+            
+            window.attendanceChart.data.labels = newLabels;
+            window.attendanceChart.data.datasets[0].data = newData;
+            window.attendanceChart.update();
+        }
+        
+        function updateFacultyChart() {
+            // In a real app, we would update with real data
+            // For this demo, we'll just use sample data
+            const newData = [0, 0, 0, 0, 0];
+            
+            window.facultyChart.data.datasets[0].data = newData;
+            window.facultyChart.update();
+        }
+        
+        // Utility functions
+        function showToast(message, type = 'success') {
+            const toast = $('#toast');
+            toast.removeClass('error warning').addClass(type);
+            toast.text(message).fadeIn();
+            
+            setTimeout(() => {
+                toast.fadeOut();
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 
