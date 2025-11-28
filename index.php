@@ -9,8 +9,8 @@ if (!isset($_SESSION['users'])) {
             'email' => 'admin@univ-alger.dz',
             'password' => 'password',
             'role' => 'admin',
-            'firstName' => 'Sarah',
-            'lastName' => 'Wilson',
+            'firstName' => 'Rania',
+            'lastName' => 'Assiakhi',
             'phone' => '+213 123 456 791',
             'faculty' => 'administration',
             'department' => 'administration',
@@ -3237,4 +3237,5 @@ function getDepartmentDescription($department) {
         }
     </script>
 </body>
+
 </html>
